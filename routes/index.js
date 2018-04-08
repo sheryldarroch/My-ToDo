@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const ToDo = require('../models/todos');
+const ToDosList = require('./todoslist');
 
 //GET /profile
 router.get('/profile', (req, res, next) => {
@@ -112,36 +113,33 @@ router.get('/about', (req, res, next) => {
   return res.render('about', {title: "About"});
 });
 
-// //POST /todo
-// router.post('/todo', (req, res, next) => {
-//   if(req.body.todolistname) {
-//
-//     //create object with form input
-//     let ToDoData = {
-//       user: User._id,
-//       todolistname: req.body.todolistname,
-//       todolist: {
-//         todoitem: req.body.,
-//         completed: false
-//       }
-//     };
-//
-//   // use schema's create method to insert document into Mongo
-//   Todo.create(ToDoData, function(error, user) {
-//     if(error) {
-//       return next(error);
-//     } else {
-//       req.session.userId = user._id;
-//       return res.redirect('/todo');
-//     }
-//   });
-//
-// } else {
-//   const err = new Error('Your list needs a name.');
-//   err.status = 400;
-//   return next(err);
-// }
-// });
+//POST /todo
+router.post('/todo', (req, res, next) => {
+  if( req.session.userId && req.body.todolistname) {
+
+    //create object with form input
+    let ToDoData = {
+      user: User._id,
+      todolistname: req.body.todolistname,
+      todolist: ToDosList
+    };
+
+  // use schema's create method to insert document into Mongo
+  Todo.create(ToDoData, function(error, user) {
+    if(error) {
+      return next(error);
+    } else {
+      req.session.userId = user._id;
+      return res.redirect('/todo');
+    }
+  });
+
+} else {
+  const err = new Error('Your list needs a name.');
+  err.status = 400;
+  return next(err);
+}
+});
 
 // GET /todo
 router.get('/todo', (req, res, next) => {
