@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .main.container-fluid.bg-info.text-sm-center.py-2
+    .row
+      .col-md-8.mx-auto
+        h1.mb-2 My ToDo List
+
+        //todo list
+        form(method="POST" action='/todo')
+          div.form-group.mt-4
+            label.sr-only(for='todolistname') List Name:
+            input#todolistname.form-control(type='text', placeholder="Name your ToDo List", name='todolistname')
+          div.form-group.mt-3
+            label.sr-only(for='addtodotextinput') ToDo Item:
+            input#addtodotextinput.form-control(type='text', placeholder='What do you need to do today? Add a ToDo List item.' name='addtodotextinput')
+          #todolist
+          button.btn.btn-oultine-dark.mb-2(type='submit') Save
