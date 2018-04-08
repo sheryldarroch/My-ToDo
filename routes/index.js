@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const ToDo = require('../models/todos');
+const Todos = require('../models/todos');
 const ToDosList = require('./todoslist');
 
 //GET /profile
@@ -118,14 +118,14 @@ router.post('/todo', (req, res, next) => {
   if( req.session.userId && req.body.todolistname) {
 
     //create object with form input
-    let ToDoData = {
+    let TodosData = {
       user: User._id,
       todolistname: req.body.todolistname,
       todolist: ToDosList
     };
 
   // use schema's create method to insert document into Mongo
-  Todo.create(ToDoData, function(error, user) {
+  Todos.create(TodosData, function(error, user) {
     if(error) {
       return next(error);
     } else {
@@ -143,6 +143,19 @@ router.post('/todo', (req, res, next) => {
 
 // GET /todo
 router.get('/todo', (req, res, next) => {
+  if(! req.session.userId) {
+    let err = new Error('You are not logged in!');
+    err.status = 403;
+    return next(err);
+  }
+  Todos.findById(req.session.userId)
+    .exec((error, user) => {
+      if(error) {
+        return next(error);
+      } else {
+        return res.render('todo', {title: 'Todo', todolistname: Todos.todolistname, todolist: Todos.todolist});
+      }
+    });
   return res.render('todo', {title: "ToDo"});
 });
 

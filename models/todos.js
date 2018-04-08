@@ -8,6 +8,7 @@ var ToDoSchema = new mongoose.Schema({
     },
     todolistname: {
       type: String,
+      unique: true,
       required: true
     },
     todolist: [
