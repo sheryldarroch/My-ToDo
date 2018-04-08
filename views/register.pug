@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .main.container-fluid.row.justify-content-center
+    .col-md-6.bg-info
+      h1.display-4.mb-2 Sign Up
+
+      //registration form
+      form(method="POST" action='/register')
+        div.form-group
+          label(for='name') Name:
+          input#name.form-control(type='text', placeholder='first and last' name='name')
+        div.form-group
+          label(for='email') Email:
+          input#email.form-control(type='email', placeholder='name@email.com' name='email')
+        div.form-group
+          label(for='pw') Password:
+          input#pw.form-control(type='password' name='password')
+        div.form-group
+          label(for='pw2') Confirm Password:
+          input#pw2.form-control(type='password' name='confirmPassword')
+        button.btn.btn-oultine-dark.mb-2(type='submit') Sign Up

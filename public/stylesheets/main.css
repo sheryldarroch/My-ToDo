@@ -1,0 +1,13 @@
+body {
+    background: #b5651d url('../images/ToDo-bg2.jpg') no-repeat;
+    background-size: cover;
+}
+
+.nav-avatar {
+  width: 32px;
+  height: auto;
+}
+.avatar {
+    width: 75px;
+    border: solid 4px rgba(255, 255, 255 0.5);
+}

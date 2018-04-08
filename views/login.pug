@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .main.container-fluid.row.justify-content-center
+    .col-md-6.bg-info
+      h1.display-4.mb-2 Log In
+
+      //registration form
+      form(method="POST" action='/login')
+        div.form-group
+          label(for='email') Email:
+          input#email.form-control(type='email', placeholder='name@email.com' name='email')
+        div.form-group
+          label(for='pw') Password:
+          input#pw.form-control(type='password' name='password', placeholder="password")
+        button.btn.btn-oultine-dark.mb-2(type='submit') Log In

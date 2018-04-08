@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  .main.container-fluid.bg-info.text-sm-center.py-2
+    .row
+      .col-md-8.mx-auto
+        h1.mb-2 Welcome to My ToDo List!
+          img.img-fluid.avatar.mx-auto.my-4.d-block(src="/images/user.png" alt="avatar")
+          h1.text-white #{name}
+
+          h2.mt-4 ToDo Lists
+          a.btn.btn-outline-dark.btn-lg.my-1(href='/todo') Create a ToDo List
