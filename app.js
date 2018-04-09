@@ -67,6 +67,6 @@ app.use((err, req, res, next) => {
 });
 
 //Listen on port 3000
-app.listen(3000, () => {
-  console.log('Express app listening on port 3000!')
+app.listen(port, () => {
+  console.log('Server running at http://oursite:' + port + '/');
 });
