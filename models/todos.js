@@ -8,7 +8,6 @@ var ToDoSchema = new mongoose.Schema({
     },
     todolistname: {
       type: String,
-      unique: true,
       required: true
     },
     todolist: [
@@ -18,6 +17,7 @@ var ToDoSchema = new mongoose.Schema({
       }
     ]
 });
+
 
 var ToDo = mongoose.model('ToDo', ToDoSchema);
 module.exports = ToDo;
