@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const ToDo = require('../models/todos');
+const Todos = require('../models/todos');
 
 //GET /profile
 router.get('/profile', (req, res, next) => {
@@ -28,7 +28,7 @@ router.get('/logout', (req, res, next) => {
       if(err) {
         return next(err);
       } else {
-        res.redirect('/');
+        return res.redirect('/');
       }
     });
   }
@@ -112,40 +112,63 @@ router.get('/about', (req, res, next) => {
   return res.render('about', {title: "About"});
 });
 
-// //POST /todo
-// router.post('/todo', (req, res, next) => {
-//   if(req.body.todolistname) {
-//
-//     //create object with form input
-//     let ToDoData = {
-//       user: User._id,
-//       todolistname: req.body.todolistname,
-//       todolist: {
-//         todoitem: req.body.,
-//         completed: false
-//       }
-//     };
-//
-//   // use schema's create method to insert document into Mongo
-//   Todo.create(ToDoData, function(error, user) {
-//     if(error) {
-//       return next(error);
-//     } else {
-//       req.session.userId = user._id;
-//       return res.redirect('/todo');
-//     }
-//   });
-//
-// } else {
-//   const err = new Error('Your list needs a name.');
-//   err.status = 400;
-//   return next(err);
-// }
-// });
+//POST /todo
+router.post('/todo', (req, res, next) => {
+  //if todolistname is in the request
+  if (req.body.todolistname) {
+
+      //use create method to insert document into Mongo
+      Todos.create(req.body, (err, result) => {
+        if (err) return console.log(err)
+
+        //save the todolistname to a session variable to pass to the redirect
+        req.session.listname = req.body.todolistname
+        console.log('saved to database')
+        res.redirect('/todolist')
+      })
+
+  } else {
+    const err = new Error('Your list needs a name.');
+    err.status = 400;
+    return next(err);
+  }
+});
 
 // GET /todo
 router.get('/todo', (req, res, next) => {
-  return res.render('todo', {title: "ToDo"});
+  // check if user is logged in
+  if(! req.session.userId) {
+    let err = new Error('You are not logged in!');
+    err.status = 403;
+    return next(err);
+  }
+  return res.render('todo', {title: 'ToDo'});
+});
+
+//Get /todoslist
+router.get('/todolist', (req, res, next) => {
+  // find the todolistname that was submitted
+  Todos.findOne({ 'todolistname': req.session.listname})
+    .exec((error, todos) => {
+      if(error) {
+        return next(error);
+      } else {
+        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname})
+      }
+    });
+});
+
+//POST /additem
+router.post('/additem', (req, res, next) => {
+  let todolistitem = {'todoitem': req.body.todoiteminput, "completed": false};
+  Todos.findOneAndUpdate({'todolistname': req.session.listname}, {$push: {todolist: todolistitem}})
+    .exec((error, todos) => {
+      if (error) {
+        return next(error);
+      } else {
+        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname, todoitem: req.body.todoiteminput});
+      }
+    });
 });
 
 module.exports = router;

@@ -4,10 +4,16 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const app = express();
+const port = process.env.PORT || 3000;
+const mongodbUri = process.env.MONGO_URI;
 
-// mongodb connection using mongoose
-mongoose.connect("mongodb://localhost:27017/ToDo")
-const db = mongoose.connection;
+require('dotenv').config();
+
+// mLab/mongodb connection using mongoose
+mongoose.connect( mongodbUri || "mongodb://localhost:27017/todos");
+var db = mongoose.connection;
+//mongo error
+db.on('error', console.error.bind(console, 'connection error:'));
 
 // use sessions for tracking logins
 app.use(session({
@@ -60,9 +66,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-let port = process.env.PORT || 3000;
-
-// listen on port 3000
-app.listen(port, () => {
-  console.log('The application is running on port:' + port + '!')
+//Listen on port 3000
+app.listen(3000, () => {
+  console.log('Express app listening on port 3000!')
 });
