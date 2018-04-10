@@ -10,7 +10,7 @@ const mongodbUri = process.env.MONGO_URI;
 require('dotenv').config();
 
 // mLab/mongodb connection using mongoose
-mongoose.connect( mongodbUri || "mongodb://localhost:27017/todos");
+mongoose.connect( mongodbUri);
 var db = mongoose.connection;
 //mongo error
 db.on('error', console.error.bind(console, 'connection error:'));
