@@ -6,10 +6,10 @@ const MongoStore = require('connect-mongo')(session);
 const app = express();
 const port = process.env.PORT || 3000;
 
-require('dotenv').config();
+// require('dotenv').config();
 
 // mLab/mongodb connection using mongoose
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1/todos');
 var db = mongoose.connection;
 //mongo error
 db.on('error', console.error.bind(console, 'connection error:'));
