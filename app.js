@@ -5,12 +5,11 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const app = express();
 const port = process.env.PORT || 3000;
-const mongodbUri = process.env.MONGO_URI;
 
 require('dotenv').config();
 
 // mLab/mongodb connection using mongoose
-mongoose.connect( mongodbUri);
+mongoose.connect(process.env.MONGO_URI);
 var db = mongoose.connection;
 //mongo error
 db.on('error', console.error.bind(console, 'connection error:'));
