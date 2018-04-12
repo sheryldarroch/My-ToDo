@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const Todos = require('../models/todos');
+const mid = require('../middleware');
 
 //GET /profile
-router.get('/profile', (req, res, next) => {
+router.get('/profile', mid.requiresLogin, (req, res, next) => {
   if(! req.session.userId) {
     let err = new Error('You are not logged in!');
     err.status = 403;
@@ -35,7 +36,7 @@ router.get('/logout', (req, res, next) => {
 });
 
 // GET /login
-router.get('/login', (req, res, next) => {
+router.get('/login', mid.loggedOut, (req, res, next) => {
   return res.render('login', {title: 'Log In'});
 });
 
@@ -60,7 +61,7 @@ router.post('/login', (req, res, next) => {
 });
 
 // GET /register
-router.get('/register', (req, res, next) => {
+router.get('/register', mid.loggedOut, (req, res, next) => {
   return res.render('register', {title: 'Sign Up'});
 });
 
@@ -118,15 +119,15 @@ router.post('/todo', (req, res, next) => {
   if (req.body.todolistname) {
 
       //use create method to insert document into Mongo
-      Todos.create(req.body, (err, result) => {
-        if (err) return console.log(err)
-
-        //save the todolistname to a session variable to pass to the redirect
-        req.session.listname = req.body.todolistname
-        console.log('saved to database')
-        res.redirect('/todolist')
-      })
-
+      Todos.create(req.body, (err, todos)=> {
+        if (err) {
+          return next(err);
+        } else {
+          //save the todolistname to a session variable to pass to the redirect
+          req.session.listname = req.body.todolistname
+          return res.redirect('todolist');
+        }
+      });
   } else {
     const err = new Error('Your list needs a name.');
     err.status = 400;
@@ -135,40 +136,38 @@ router.post('/todo', (req, res, next) => {
 });
 
 // GET /todo
-router.get('/todo', (req, res, next) => {
-  // check if user is logged in
-  if(! req.session.userId) {
-    let err = new Error('You are not logged in!');
-    err.status = 403;
-    return next(err);
-  }
+router.get('/todo', mid.requiresLogin, (req, res, next) => {
   return res.render('todo', {title: 'ToDo'});
 });
 
 //Get /todoslist
-router.get('/todolist', (req, res, next) => {
+router.get('/todolist', mid.requiresLogin, (req, res, next) => {
   // find the todolistname that was submitted
   Todos.findOne({ 'todolistname': req.session.listname})
     .exec((error, todos) => {
       if(error) {
         return next(error);
       } else {
-        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname})
+        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname, todos: todos.todolist})
       }
     });
 });
 
 //POST /additem
 router.post('/additem', (req, res, next) => {
-  let todolistitem = {'todoitem': req.body.todoiteminput, "completed": false};
-  Todos.findOneAndUpdate({'todolistname': req.session.listname}, {$push: {todolist: todolistitem}})
+  if (req.body.todoiteminput !== "") {
+    let todolistitem = {'todoitem': req.body.todoiteminput, "completed": false};
+    Todos.findOneAndUpdate({'todolistname': req.session.listname}, {$push: {todolist: todolistitem}})
     .exec((error, todos) => {
-      if (error) {
-        return next(error);
-      } else {
-        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname, todoitem: req.body.todoiteminput});
-      }
-    });
+        if (error) {
+          return next(error);
+        } else {
+          return res.redirect('todolist');
+       }
+      });
+    } else {
+      return res.redirect('todolist');
+    }
 });
 
 module.exports = router;

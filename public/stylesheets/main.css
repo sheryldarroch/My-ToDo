@@ -11,3 +11,33 @@ body {
     width: 75px;
     border: solid 4px rgba(255, 255, 255 0.5);
 }
+
+.editIcon,
+.deleteButton,
+.toggleIcon {
+  width: 32px;
+  height: 32px;
+  padding: 0.313rem;
+  margin: 0;
+  position: absolute;
+  top: 20%;
+}
+
+.toggleIcon {
+  left: 5px;
+}
+
+.editIcon {
+  right: 34px;
+}
+
+.deleteButton {
+  right: 5px;
+}
+
+@media (min-width: 768px) {
+
+  .editIcon {
+    right: 46px;
+  }
+}

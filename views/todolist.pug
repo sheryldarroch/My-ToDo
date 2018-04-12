@@ -5,19 +5,28 @@ block content
     .row
       .col-md-8.mx-auto
         h1.mb-2 This is your ToDo List
-        h2.mb-2 #{todolistname}
+        h2.mb-2= todolistname
 
         //todo list
         form(method="POST" action='/additem')
           div.form-group.mt-4
             label.sr-only(for='todoiteminput') List Name:
             input#todoiteminput.form-control(type='text', placeholder="What would you like to do today? Add an item to your list.", name='todoiteminput')
-            button.btn.btn-oultine-dark.my-2(type='submit') Save item
+            button.btn.btn-oultine-dark.my-2(type='submit') Add Item
 
         div
-          ul.list-group
-            li.list-group-item #{todoitem}
-            li.list-group-item Learn PHP
-            li.list-group-item Learn MySQL
-            li.list-group-item Create Amazing Web Apps
-          button.btn.btn-danger.my-2 Delete list
+          if todos
+            -`let todos = #{todos}`
+              ul#todoList.list-group
+                each todo, index in todos
+                  li.todoItem.list-group-item.text-sm-left.pl-3
+                    if todo.completed === true
+                      img.toggleIcon(src='/images/check-mark.svg' alt='check icon')
+                    else
+                      img.toggleIcon(src='/images/circle.svg' alt='circle icon')
+                    p.ml-4= todo.todoitem
+                    img.editIcon(src='/images/edit.svg' alt='edit icon')
+                    img.deleteButton(src='/images/delete-circle.svg' alt='delete icon')
+
+          else
+            li.list-group-item Your todo item goes here.
