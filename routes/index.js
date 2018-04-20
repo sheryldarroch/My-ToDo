@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
@@ -114,7 +116,7 @@ router.get('/about', (req, res, next) => {
 });
 
 //POST /todo
-router.post('/todo', (req, res, next) => {
+router.post('/todo', mid.requiresLogin, (req, res, next) => {
   //if todolistname is in the request
   if (req.body.todolistname) {
 
