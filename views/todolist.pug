@@ -7,6 +7,8 @@ block content
         h1.mb-2 This is your ToDo List
         h2.mb-2= todolistname
 
+        button.btn.btn-danger Delete ToDo List
+
         //todo list
         form(method="POST" action='/additem')
           div.form-group.mt-4
@@ -18,7 +20,7 @@ block content
           if todos
             -`let todos = #{todos}`
               ul#todoList.list-group
-                each todo, index in todos
+                each todo in todos
                   li.todoItem.list-group-item.text-sm-left.pl-3
                     if todo.completed === true
                       img.toggleIcon(src='/images/check-mark.svg' alt='check icon')

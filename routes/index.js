@@ -124,7 +124,7 @@ router.post('/todo', (req, res, next) => {
           return next(err);
         } else {
           //save the todolistname to a session variable to pass to the redirect
-          req.session.listname = req.body.todolistname
+          req.session.listname = req.body.todolistname;
           return res.redirect('todolist');
         }
       });
@@ -140,7 +140,7 @@ router.get('/todo', mid.requiresLogin, (req, res, next) => {
   return res.render('todo', {title: 'ToDo'});
 });
 
-//Get /todoslist
+//Get /todolist
 router.get('/todolist', mid.requiresLogin, (req, res, next) => {
   // find the todolistname that was submitted
   Todos.findOne({ 'todolistname': req.session.listname})
@@ -148,7 +148,7 @@ router.get('/todolist', mid.requiresLogin, (req, res, next) => {
       if(error) {
         return next(error);
       } else {
-        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname, todos: todos.todolist})
+        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname, todos: todos.todolist, todolistId: todos._id })
       }
     });
 });
