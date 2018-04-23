@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const Todos = require('../models/todos');
+const TodoList = require('../models/todolist');
 const mid = require('../middleware');
 
 //GET /profile
@@ -115,61 +115,5 @@ router.get('/about', (req, res, next) => {
   return res.render('about', {title: "About"});
 });
 
-//POST /todo
-router.post('/todo', mid.requiresLogin, (req, res, next) => {
-  //if todolistname is in the request
-  if (req.body.todolistname) {
-
-      //use create method to insert document into Mongo
-      Todos.create(req.body, (err, todos)=> {
-        if (err) {
-          return next(err);
-        } else {
-          //save the todolistname to a session variable to pass to the redirect
-          req.session.listname = req.body.todolistname;
-          return res.redirect('todolist');
-        }
-      });
-  } else {
-    const err = new Error('Your list needs a name.');
-    err.status = 400;
-    return next(err);
-  }
-});
-
-// GET /todo
-router.get('/todo', mid.requiresLogin, (req, res, next) => {
-  return res.render('todo', {title: 'ToDo'});
-});
-
-//Get /todolist
-router.get('/todolist', mid.requiresLogin, (req, res, next) => {
-  // find the todolistname that was submitted
-  Todos.findOne({ 'todolistname': req.session.listname})
-    .exec((error, todos) => {
-      if(error) {
-        return next(error);
-      } else {
-        return res.render('todolist', {title: 'ToDoList', todolistname: todos.todolistname, todos: todos.todolist, todolistId: todos._id })
-      }
-    });
-});
-
-//POST /additem
-router.post('/additem', (req, res, next) => {
-  if (req.body.todoiteminput !== "") {
-    let todolistitem = {'todoitem': req.body.todoiteminput, "completed": false};
-    Todos.findOneAndUpdate({'todolistname': req.session.listname}, {$push: {todolist: todolistitem}})
-    .exec((error, todos) => {
-        if (error) {
-          return next(error);
-        } else {
-          return res.redirect('todolist');
-       }
-      });
-    } else {
-      return res.redirect('todolist');
-    }
-});
 
 module.exports = router;

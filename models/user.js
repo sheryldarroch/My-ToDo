@@ -1,8 +1,11 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var bcrypt = require('bcrypt');
-var UserSchema = new mongoose.Schema({
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const Schema = mongoose.Schema();
+
+// User Schema
+const UserSchema = new Schema({
     email: {
       type: String,
       unique: true,
@@ -19,6 +22,7 @@ var UserSchema = new mongoose.Schema({
       required: true
     }
 });
+
 // authenticate input against database
 UserSchema.statics.authenticate = function(email, password, callback) {
   User.findOne({ email: email})
@@ -39,9 +43,10 @@ UserSchema.statics.authenticate = function(email, password, callback) {
       });
     });
 }
+
 // hash password before saving in database
 UserSchema.pre('save', function(next) {
-    var user = this;
+    let user = this;
     bcrypt.hash(user.password, 10, function(err, hash) {
       if (err) {
         return next(err);
@@ -51,5 +56,5 @@ UserSchema.pre('save', function(next) {
     })
 });
 
-var User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
 module.exports = User;

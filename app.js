@@ -46,9 +46,23 @@ app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
 
+// CORS Access
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origins", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  if(req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE");
+    return res.status(200).json({});
+  }
+  next();
+});
+
 // include routes
-const routes = require('./routes/index');
-app.use(routes);
+const mainRoutes = require('./routes/index');
+const todoRoutes = require('./routes/todo');
+
+app.use(mainRoutes);
+app.use('/todo', todoRoutes);
 
 //catch 404 and forward to error handler
 app.use((req, res, next) => {
