@@ -1,13 +1,13 @@
 'use strict';
 
-loggedOut = (req, res, next) => {
+const loggedOut = (req, res, next) => {
   if (req.session && req.session.userId) {
     return res.redirect('/profile');
   }
   return next();
 }
 
-requiresLogin = (req, res, next) => {
+const requiresLogin = (req, res, next) => {
   if (req.session && req.session.userId) {
     return next();
   } else {

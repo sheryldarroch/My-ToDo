@@ -8,8 +8,6 @@ const MongoStore = require('connect-mongo')(session);
 const app = express();
 let port = process.env.PORT || 3000;
 
-// require('dotenv').config();
-
 // mLab/mongodb connection using mongoose
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1/todos');
 let db = mongoose.connection;

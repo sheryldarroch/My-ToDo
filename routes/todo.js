@@ -2,8 +2,11 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user');
-const TodoList = require('../models/todolist');
+const Models = require('../models/user');
+const User = Models.User;
+const TodoList = Models.ToDoList;
+// const mongoose = require('mongoose');
+// const ToDoList = mongoose.model('ToDoList');
 const mid = require('../middleware');
 
 router.param("lId", (req, res, next, id) => {
@@ -24,23 +27,25 @@ router.param("lId", (req, res, next, id) => {
 router.post('/', mid.requiresLogin, (req, res, next) => {
   //if todolistname is in the request
   if (req.body.todolistname) {
-      const todolist = new ToDoList(req.body);
-      todolist.save((err, todolist) => {
-        if(err) return next(err);
-        res.status(201);
-        res.render('todo', {title: 'ToDo', todolist: todolist});
-      });
+
+      //create object with form input
+      let todoData = {
+        user: req.session.userid,
+        todolistname: req.body.todolistname
+      };
+
       //use create method to insert document into Mongo
-      // ToDoList.create(req.body, (err, todolist)=> {
-      //   if (err) {
-      //     return next(err);
-      //   } else {
-      //     //save the todolistname to a session variable to pass to the redirect
-      //     // req.session.listname = req.body.todolistname;
-      //     // return res.redirect('todolist');
-      //     res.json(todolist);
-      //   }
-      // });
+      ToDoList.create(todoData, (err, todolist)=> {
+          if (err) {
+            return next(err);
+          } else {
+            const title = 'ToDo';
+            const todolistname = todolist.todolistname;
+            const todoitems = todolist.todoitems;
+            const templateData = {title, todolistname, todoitems}
+            res.render('todo', templateData);
+        }
+        });
   } else {
     const err = new Error('Your list needs a name.');
     err.status = 400;
@@ -51,13 +56,8 @@ router.post('/', mid.requiresLogin, (req, res, next) => {
 // GET /todo
 // Route for getting todo lists
 router.get('/', mid.requiresLogin, (req, res, next) => {
-  ToDoList.find({})
-                  .sort({todolistname: -1})
-                  .exec((err, todolists) => {
-                      if(err) return next(err);
-                      res.render('todo', {title: 'ToDo', todolists: todolists});
-                    });
-  //return res.render('todo', {title: 'ToDo'});
+
+  res.render('todo', {title: 'ToDo'});
 });
 
 // GET /todo/:lId
@@ -131,4 +131,4 @@ router.post('/additem', (req, res, next) => {
     }
 });
 
-module.exports = 'router';
+module.exports = router;

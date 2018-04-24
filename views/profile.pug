@@ -9,4 +9,9 @@ block content
           h1.text-white #{name}
 
           h2.mt-4 ToDo Lists
+          if todolists
+            -`let todolists = #{todolists}`
+            ul.myLists.list-group
+              each todolist in todolists
+                li(id=`${todolist._id}`).list-group-item= todolistname
           a.btn.btn-outline-dark.btn-lg.my-1(href='/todo') Create a ToDo List

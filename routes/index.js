@@ -2,25 +2,37 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user');
-const TodoList = require('../models/todolist');
+const Models = require('../models/user');
+const User = Models.User;
+const TodoList = Models.ToDoList;
 const mid = require('../middleware');
 
 //GET /profile
 router.get('/profile', mid.requiresLogin, (req, res, next) => {
-  if(! req.session.userId) {
-    let err = new Error('You are not logged in!');
-    err.status = 403;
-    return next(err);
-  }
+  // let name = '';
+  // let todolists = '';
+
+  //find current user
   User.findById(req.session.userId)
     .exec((error, user) => {
       if(error) {
         return next(error);
       } else {
-        return res.render('profile', {title: 'Profile', name: user.name});
+          res.render('profile', {title: 'Profile', name: user.name});
       }
     });
+
+    // ToDoList.find({})
+    //                 .sort({todolistname: -1})
+    //                 .exec((err, todolists) => {
+    //                     if(err) return next(err);
+    //                     return todolists;
+    //                     // res.render('todo', {title: 'ToDo', todolists: todolists});
+    //                   });
+    // const title = 'Profile'
+    // todolists = todolists;
+    // const templateData = {title, name, todolists};
+    // res.render('profile', templateData);
 });
 
 // GET /Logout

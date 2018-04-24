@@ -2,10 +2,9 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const Schema = mongoose.Schema();
 
 // User Schema
-const UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
     email: {
       type: String,
       unique: true,
@@ -56,5 +55,29 @@ UserSchema.pre('save', function(next) {
     })
 });
 
+// ToDoItem Schema
+const ToDoItemSchema = new mongoose.Schema({
+  text: String,
+  Completed: {type: Boolean, default: false}
+});
+
+// Instance Method to save ToDoItem edit
+ToDoItemSchema.method("edit", (edits, callback) => {
+  Object.assign(this, edits);
+  this.parent().parent().save(callback);
+});
+
+// ToDoList Schema with ToDoItem as child
+const ToDoListSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  todolistname: String,
+  todoitems: [ToDoItemSchema]
+});
+
+
 const User = mongoose.model('User', UserSchema);
-module.exports = User;
+const ToDoList = mongoose.model('ToDoList', ToDoListSchema);
+module.exports = { User, ToDoList };

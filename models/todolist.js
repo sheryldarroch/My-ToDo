@@ -1,13 +1,13 @@
 'use strict';
 
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const User = require('../models/user');
 
 // ToDoItem Schema
-const ToDoItemSchema = new Schema({
+const ToDoItemSchema = new mongoose.Schema({
   text: String,
-  Completed: {type: Boolean, default: False}
+  Completed: {type: Boolean, default: false}
 });
 
 // Instance Method to save ToDoItem edit
@@ -17,31 +17,14 @@ ToDoItemSchema.method("edit", (edits, callback) => {
 });
 
 // ToDoList Schema with ToDoItem as child
-const ToDoListSchema = new Schema({
+const ToDoListSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
   todolistname: String,
-  todolist: [ToDoItemSchema]
+  todoitems: [ToDoItemSchema]
 });
-
-// var ToDoSchema = new mongoose.Schema({
-//     user: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: 'User'
-//     },
-//     todolistname: {
-//       type: String,
-//       required: true
-//     },
-//     todolist: [
-//       {
-//       todoitem: String,
-//       completed: Boolean
-//       }
-//     ]
-// });
 
 
 const ToDoList = mongoose.model('ToDoList', ToDoListSchema);
