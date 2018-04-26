@@ -6,14 +6,14 @@ block content
       .col-md-8.mx-auto
         h1.mb-2 My ToDo List
 
-        if !todolistname
+        if !todoListName
           form(method="POST" action='/todo')
             div.form-group.mt-4
-              label.sr-only(for='todolistname') List Name:
-              input#todolistname.form-control(type='text', placeholder="Name your ToDo List", name='todolistname')
+              label.sr-only(for='todoListName') List Name:
+              input#todoListName.form-control(type='text', placeholder="Name your ToDo List", name='todoListName')
               button.btn.btn-oultine-dark.my-2(type='submit') Save
         else
-          h2.mb-2= todolistname
+          h2.mb-2= todoListName
           button.btn.btn-danger Delete ToDo List
           //todo list
           form(method="POST" action='/additem')

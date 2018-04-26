@@ -2,50 +2,49 @@
 
 const express = require('express');
 const router = express.Router();
-const Models = require('../models/user');
-const User = Models.User;
-const TodoList = Models.ToDoList;
-// const mongoose = require('mongoose');
-// const ToDoList = mongoose.model('ToDoList');
+const User = require('../models/user');
 const mid = require('../middleware');
 
-router.param("lId", (req, res, next, id) => {
-  ToDoList.findbyId(id, (err, doc) => {
-    if(err) return next(err);
-    if(!doc) {
-      err = new Error("Not Found");
-      err.status = 404;
-      return next(err);
-    }
-    req.todolist = doc;
-    return next();
-  });
-});
+// router.param("lId", (req, res, next, id) => {
+//   ToDoList.findbyId(id, (err, doc) => {
+//     if(err) return next(err);
+//     if(!doc) {
+//       err = new Error("Not Found");
+//       err.status = 404;
+//       return next(err);
+//     }
+//     req.todolist = doc;
+//     return next();
+//   });
+// });
 
 //POST /todo
 // Route for creating a todo list
 router.post('/', mid.requiresLogin, (req, res, next) => {
+  let newTodos = [{
+    todoListName: req.body.todoListName
+  }];
   //if todolistname is in the request
-  if (req.body.todolistname) {
-
-      //create object with form input
-      let todoData = {
-        user: req.session.userid,
-        todolistname: req.body.todolistname
-      };
-
-      //use create method to insert document into Mongo
-      ToDoList.create(todoData, (err, todolist)=> {
-          if (err) {
-            return next(err);
-          } else {
-            const title = 'ToDo';
-            const todolistname = todolist.todolistname;
-            const todoitems = todolist.todoitems;
-            const templateData = {title, todolistname, todoitems}
-            res.render('todo', templateData);
-        }
-        });
+  if (req.body.todoListName !== "") {
+      User.findOne({'userId': req.session.currentUser}, (error, user) => {
+          let todos = user.todos;
+          for(let i = 0; i < todos.length; i++) {
+            if(req.body.todoListName.toLowerCase() === todos[i].todoListName.toLowerCase()) {
+                const err = new Error('Each TodoList must have a unique name.');
+                err.status = 400;
+                return next(err);
+            }
+          }
+          User.update({'userId': req.session.currentUser}, {$push: {todos: newTodos}}, {new: true}, (error, user) =>{
+              if(error) {
+                return next(error);
+              } else {
+                let todoListName = req.body.todoListName;
+                console.log("This is the user from the todo post method " + user);
+                res.render('ToDo', {title: 'ToDo', todoListName: req.body.todoListName, user: user});
+              }
+          });
+      });
   } else {
     const err = new Error('Your list needs a name.');
     err.status = 400;
@@ -57,13 +56,13 @@ router.post('/', mid.requiresLogin, (req, res, next) => {
 // Route for getting todo lists
 router.get('/', mid.requiresLogin, (req, res, next) => {
 
-  res.render('todo', {title: 'ToDo'});
+  res.render('ToDo', {title: 'ToDo'});
 });
 
 // GET /todo/:lId
 // Route for specific todo list
 router.get("/:lId", (req, res, next) => {
-  res.render('Todo', req.todolist);
+  res.render('ToDo', req.todolist);
 });
 
 // DELETE /todo/:lId
@@ -97,38 +96,38 @@ router.delete("/:lId/items/:iId", (req, res, next) => {
 });
 
 
-//Get /todolist
-router.get('/todolist', mid.requiresLogin, (req, res, next) => {
-  // find the todolistname that was submitted
-  Todos.findOne({ 'todolistname': req.session.listname})
-    .exec((error, todos) => {
-      if(error) {
-        return next(error);
-      } else {
-        const todolistname = todos.todolistname;
-        const todos = todos.todolist;
-        const todolistId = todos._id;
-        const templateData = {todolistname, todos, todolistId};
-        res.render('todolist', {title: 'ToDoList', templateData })
-      }
-    });
-});
-
-//POST /additem
-router.post('/additem', (req, res, next) => {
-  if (req.body.todoiteminput !== "") {
-    let todolistitem = {'todoitem': req.body.todoiteminput, "completed": false};
-    Todos.findOneAndUpdate({'todolistname': req.session.listname}, {$push: {todolist: todolistitem}})
-    .exec((error, todos) => {
-        if (error) {
-          return next(error);
-        } else {
-          return res.redirect('todolist');
-       }
-      });
-    } else {
-      return res.redirect('todolist');
-    }
-});
+// //Get /todolist
+// router.get('/todolist', mid.requiresLogin, (req, res, next) => {
+//   // find the todolistname that was submitted
+//   Todos.findOne({ 'todolistname': req.session.listname})
+//     .exec((error, todos) => {
+//       if(error) {
+//         return next(error);
+//       } else {
+//         const todolistname = todos.todolistname;
+//         const todos = todos.todolist;
+//         const todolistId = todos._id;
+//         const templateData = {todolistname, todos, todolistId};
+//         res.render('todolist', {title: 'ToDoList', templateData })
+//       }
+//     });
+// });
+//
+// //POST /additem
+// router.post('/additem', (req, res, next) => {
+//   if (req.body.todoiteminput !== "") {
+//     let todolistitem = {'todoitem': req.body.todoiteminput, "completed": false};
+//     Todos.findOneAndUpdate({'todolistname': req.session.listname}, {$push: {todolist: todolistitem}})
+//     .exec((error, todos) => {
+//         if (error) {
+//           return next(error);
+//         } else {
+//           return res.redirect('todolist');
+//        }
+//       });
+//     } else {
+//       return res.redirect('todolist');
+//     }
+// });
 
 module.exports = router;

@@ -2,23 +2,19 @@
 
 const express = require('express');
 const router = express.Router();
-const Models = require('../models/user');
-const User = Models.User;
-const TodoList = Models.ToDoList;
+const User = require('../models/user');
 const mid = require('../middleware');
 
 //GET /profile
 router.get('/profile', mid.requiresLogin, (req, res, next) => {
-  // let name = '';
-  // let todolists = '';
-
   //find current user
   User.findById(req.session.userId)
     .exec((error, user) => {
       if(error) {
         return next(error);
       } else {
-          res.render('profile', {title: 'Profile', name: user.name});
+          console.log(user);
+          res.render('profile', {title: 'Profile', name: user.name, todolists: user.todos});
       }
     });
 
@@ -63,7 +59,7 @@ router.post('/login', (req, res, next) => {
         err.status = 401;
         return next(err);
       } else {
-        req.session.userId = user._id;
+        req.session.userId = User._id;
         return res.redirect('/profile');
       }
     });
